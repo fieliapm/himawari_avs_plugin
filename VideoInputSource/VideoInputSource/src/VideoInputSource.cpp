@@ -22,7 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "videoInput/videoInput.h"
 #include <avisynth.h>
-//#include <stdlib.h>
 
 
 
@@ -32,6 +31,7 @@ private:
 	int mDeviceID;
 	int mWidth, mHeight;
 	int mSize;
+	int mRowSize;
 	unsigned char* mBuffer;
 	bool mFrameSkip;
 	VideoInfo vi;
@@ -60,6 +60,7 @@ public:
 			env->ThrowError("VideoInputSource: cannot init videoInput with assigned width and height");
 		}
 
+		mRowSize = sizeof(unsigned char)*3*mWidth;
 		mBuffer = new unsigned char[mSize];
 		memset(mBuffer, 0, sizeof(unsigned char)*mSize);
 
@@ -83,8 +84,6 @@ public:
 		const int dst_pitch = dst->GetPitch();
 		const int dst_row_size = dst->GetRowSize();
 		const int dst_height = dst->GetHeight();
-
-		const int mRowSize = sizeof(unsigned char)*3*mWidth;
 
 		if(!(dst_row_size == mRowSize && dst_height == mHeight)) {
 			env->ThrowError("VideoInputSource: frame format is not match");
@@ -117,7 +116,7 @@ AVSValue __cdecl Create_VideoInputSource(AVSValue args, void* user_data, IScript
 	int fps_numerator = args[4].AsInt(30);
 	int fps_denominator = args[5].AsInt(1);
 	int num_frames = (int)(60*60*24*(__int64)fps_numerator/(__int64)fps_denominator);
-	return new VideoInputSource(args[0].AsInt(), args[1].AsString(), args[2].AsInt(), args[3].AsInt(), fps_numerator, fps_denominator, num_frames, args[7].AsBool(true), env);
+	return new VideoInputSource(args[0].AsInt(), args[1].AsString(), args[2].AsInt(), args[3].AsInt(), fps_numerator, fps_denominator, args[6].AsInt(num_frames), args[7].AsBool(true), env);
 }
 
 
