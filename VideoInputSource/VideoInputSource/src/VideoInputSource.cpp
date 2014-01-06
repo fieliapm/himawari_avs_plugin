@@ -51,13 +51,16 @@ public:
 		} else {
 			env->ThrowError("VideoInputSource: connection type is invalid");
 		}
-		mVideoInput.setupDevice(mDeviceID, width, height, conenction);
+
+		if(!mVideoInput.setupDevice(mDeviceID, width, height, conenction)) {
+			env->ThrowError("VideoInputSource: cannot init device");
+		}
+
 		mWidth = mVideoInput.getWidth(mDeviceID);
 		mHeight = mVideoInput.getHeight(mDeviceID);
 		mSize = mVideoInput.getSize(mDeviceID);
-
 		if(!(mWidth == width && mHeight == height)) {
-			env->ThrowError("VideoInputSource: cannot init videoInput with assigned width and height");
+			env->ThrowError("VideoInputSource: cannot init device with assigned width and height");
 		}
 
 		mRowSize = sizeof(unsigned char)*3*mWidth;
