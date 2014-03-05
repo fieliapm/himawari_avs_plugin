@@ -1,4 +1,4 @@
-himawarit7a_avs_plugin
+himawari_avs_plugin
 ===================
 
 Some AviSynth plugin I written
