@@ -22,6 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "videoInput/videoInput.h"
 #include <avisynth.h>
+#include <malloc.h>
+#include <xmmintrin.h>
 
 
 
@@ -40,31 +42,36 @@ public:
 	VideoInputSource(const int device_id, const char* connection_type, const int width, const int height, const unsigned int fps_numerator, const unsigned int fps_denominator, const int num_frames, const bool frame_skip, IScriptEnvironment* env)
 		: mDeviceID(device_id), mFrameSkip(frame_skip) {
 		int conenction;
-		if(stricmp(connection_type, "Composite")==0) {
+		if (stricmp(connection_type, "Composite") == 0) {
 			conenction = VI_COMPOSITE;
-		} else if (stricmp(connection_type, "S_Video")==0) {
+		} else if (stricmp(connection_type, "S_Video") == 0) {
 			conenction = VI_S_VIDEO;
-		} else if (stricmp(connection_type, "Tuner")==0) {
+		} else if (stricmp(connection_type, "Tuner") == 0) {
 			conenction = VI_TUNER;
-		} else if (stricmp(connection_type, "USB")==0) {
+		} else if (stricmp(connection_type, "USB") == 0) {
 			conenction = VI_USB;
 		} else {
 			env->ThrowError("VideoInputSource: connection type is invalid");
 		}
 
-		if(!mVideoInput.setupDevice(mDeviceID, width, height, conenction)) {
+		if (!mVideoInput.setupDevice(mDeviceID, width, height, conenction)) {
 			env->ThrowError("VideoInputSource: cannot init device");
 		}
 
 		mWidth = mVideoInput.getWidth(mDeviceID);
 		mHeight = mVideoInput.getHeight(mDeviceID);
 		mSize = mVideoInput.getSize(mDeviceID);
-		if(!(mWidth == width && mHeight == height)) {
+		if (!(mWidth == width && mHeight == height)) {
+			mVideoInput.stopDevice(mDeviceID);
 			env->ThrowError("VideoInputSource: cannot init device with assigned width and height");
 		}
 
 		mRowSize = sizeof(unsigned char)*3*mWidth;
-		mBuffer = new unsigned char[mSize];
+		mBuffer = (unsigned char*)_aligned_malloc(mSize, sizeof(__m128));
+		if (mBuffer == NULL) {
+			mVideoInput.stopDevice(mDeviceID);
+			env->ThrowError("VideoInputSource: cannot allocate frame buffer");
+		}
 		memset(mBuffer, 0, sizeof(unsigned char)*mSize);
 
 		memset(&vi, 0, sizeof(vi));
@@ -77,29 +84,34 @@ public:
 	}
 
 	__stdcall ~VideoInputSource() {
-		delete[] mBuffer;
 		mVideoInput.stopDevice(mDeviceID);
+		_aligned_free(mBuffer);
 	}
 
 	PVideoFrame __stdcall GetFrame(int n, IScriptEnvironment* env) {
 		PVideoFrame dst = env->NewVideoFrame(vi);
-		unsigned char* dst_p = dst->GetWritePtr();
+		BYTE* dst_p = dst->GetWritePtr();
 		const int dst_pitch = dst->GetPitch();
 		const int dst_row_size = dst->GetRowSize();
 		const int dst_height = dst->GetHeight();
 
-		if(!(dst_row_size == mRowSize && dst_height == mHeight)) {
+		if (!(dst_row_size == mRowSize && dst_height == mHeight)) {
 			env->ThrowError("VideoInputSource: frame format is not match");
 		}
 
-		if((!mFrameSkip) || mVideoInput.isFrameNew(mDeviceID)) {
-			mVideoInput.getPixels(mDeviceID, mBuffer, false, false);
+		bool hasNewFrame = false;
+		while (true) {
+			hasNewFrame = mVideoInput.isFrameNew(mDeviceID);
+			if (hasNewFrame) {
+				mVideoInput.getPixels(mDeviceID, mBuffer, false, false);
+			}
+			if (mFrameSkip || hasNewFrame) {
+				break;
+			}
+			Sleep(0);
 		}
 
-		unsigned char* mBufferOffset = mBuffer;
-		for(int h=0;h<mHeight;++h,dst_p+=dst_pitch,mBufferOffset+=mRowSize) {
-			memcpy(dst_p, mBufferOffset, mRowSize);
-		}
+		env->BitBlt(dst_p, dst_pitch, mBuffer, mRowSize, mRowSize, mHeight);
 
 		return dst;
 	}
