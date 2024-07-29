@@ -1,21 +1,31 @@
-Microsoft Visual Studio Solution File, Format Version 8.00
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VideoInputSource", "VideoInputSource\VideoInputSource.vcproj", "{13F93404-BA57-4B1B-BD2B-9AADFEFBA9B0}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.35026.282
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VideoInputSource", "VideoInputSource\VideoInputSource.vcxproj", "{67ED5C2D-F2E8-4F0D-8861-0C302EB39938}"
 EndProject
 Global
-	GlobalSection(SolutionConfiguration) = preSolution
-		Debug = Debug
-		Release = Release
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
-	GlobalSection(ProjectConfiguration) = postSolution
-		{13F93404-BA57-4B1B-BD2B-9AADFEFBA9B0}.Debug.ActiveCfg = Debug|Win32
-		{13F93404-BA57-4B1B-BD2B-9AADFEFBA9B0}.Debug.Build.0 = Debug|Win32
-		{13F93404-BA57-4B1B-BD2B-9AADFEFBA9B0}.Release.ActiveCfg = Release|Win32
-		{13F93404-BA57-4B1B-BD2B-9AADFEFBA9B0}.Release.Build.0 = Release|Win32
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{67ED5C2D-F2E8-4F0D-8861-0C302EB39938}.Debug|x64.ActiveCfg = Debug|x64
+		{67ED5C2D-F2E8-4F0D-8861-0C302EB39938}.Debug|x64.Build.0 = Debug|x64
+		{67ED5C2D-F2E8-4F0D-8861-0C302EB39938}.Debug|x86.ActiveCfg = Debug|Win32
+		{67ED5C2D-F2E8-4F0D-8861-0C302EB39938}.Debug|x86.Build.0 = Debug|Win32
+		{67ED5C2D-F2E8-4F0D-8861-0C302EB39938}.Release|x64.ActiveCfg = Release|x64
+		{67ED5C2D-F2E8-4F0D-8861-0C302EB39938}.Release|x64.Build.0 = Release|x64
+		{67ED5C2D-F2E8-4F0D-8861-0C302EB39938}.Release|x86.ActiveCfg = Release|Win32
+		{67ED5C2D-F2E8-4F0D-8861-0C302EB39938}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-	EndGlobalSection
-	GlobalSection(ExtensibilityAddIns) = postSolution
+		SolutionGuid = {9C797D4A-E401-4CB4-BBD4-9766D8966D38}
 	EndGlobalSection
 EndGlobal
